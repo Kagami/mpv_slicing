@@ -1,4 +1,5 @@
 local msg = require "mp.msg"
+local utils = require "mp.utils"
 local options = require "mp.options"
 
 local cut_pos = nil
@@ -68,7 +69,9 @@ end
 
 function cut(shift, endpos)
     local cmd = trim(o.command_template:gsub("%s+", " "))
-    local inpath = escape(mp.get_property("path"))
+    local inpath = escape(utils.join_path(
+        utils.getcwd(),
+        mp.get_property("stream-path")))
     -- TODO: Windows?
     local outpath = escape(string.format("%s/%s",
         o.target_dir:gsub("~", os.getenv("HOME")),

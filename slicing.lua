@@ -3,7 +3,7 @@ local utils = require "mp.utils"
 local options = require "mp.options"
 
 local cut_pos = nil
-local copy_audio = false
+local copy_audio = true
 local o = {
     target_dir = "~",
     vcodec = "rawvideo",

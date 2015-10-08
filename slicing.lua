@@ -28,12 +28,24 @@ function timestamp(duration)
     return string.format("%02d:%02d:%02.03f", hours, minutes, seconds)
 end
 
+function osd(str)
+    return mp.osd_message(str, 3)
+end
+
 function log(str)
-    return mp.osd_message(str)
+    f = io.open(string.format("%s/cut.log", o.target_dir), "a")
+    f:write(string.format("# %s\n%s\n",
+        os.date("%Y-%m-%d %H:%M:%S"),
+        str))
+    f:close()
 end
 
 function escape(str)
     return str:gsub("'", "'\\''")
+end
+
+function trim(str)
+    return str:gsub("^%s+", ""):gsub("%s+$", "")
 end
 
 function get_csp()
@@ -55,11 +67,10 @@ function get_outname(shift, endpos)
 end
 
 function cut(shift, endpos)
-    local cmd = o.command_template:gsub("%s+", " ")
+    local cmd = trim(o.command_template:gsub("%s+", " "))
     local inpath = escape(mp.get_property("path"))
     -- TODO: Windows?
-    local outpath = escape(string.format(
-        "%s/%s",
+    local outpath = escape(string.format("%s/%s",
         o.target_dir:gsub("~", os.getenv("HOME")),
         get_outname(shift, endpos)))
 
@@ -79,6 +90,7 @@ function cut(shift, endpos)
     cmd = cmd:gsub("$in", inpath, 1)
 
     msg.info(cmd)
+    log(cmd)
     os.execute(cmd)
 end
 
@@ -90,23 +102,23 @@ function toggle_mark()
             shift, endpos = endpos, shift
         end
         if shift == endpos then
-            log("Cut fragment is empty")
+            osd("Cut fragment is empty")
         else
             cut_pos = nil
-            log(string.format(
-                "Cut fragment: %s - %s",
-                timestamp(shift), timestamp(endpos)))
+            osd(string.format("Cut fragment: %s - %s",
+                timestamp(shift),
+                timestamp(endpos)))
             cut(shift, endpos)
         end
     else
         cut_pos = pos
-        log(string.format("Marked %s as start position", timestamp(pos)))
+        osd(string.format("Marked %s as start position", timestamp(pos)))
     end
 end
 
 function toggle_audio()
     copy_audio = not copy_audio
-    log("Audio capturing is " .. (copy_audio and "enabled" or "disabled"))
+    osd("Audio capturing is " .. (copy_audio and "enabled" or "disabled"))
 end
 
 mp.add_key_binding("c", "slicing_mark", toggle_mark)

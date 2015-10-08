@@ -8,7 +8,7 @@ local o = {
     vcodec = "rawvideo",
     acodec = "pcm_s16le",
     prevf = "",
-    vf = "scale=in_color_matrix=$matrix,format=bgr24",
+    vf = "format=yuv444p16,scale=in_color_matrix=$matrix,format=bgr24",
     postvf = "",
     opts = "",
     ext = "avi",

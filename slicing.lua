@@ -34,7 +34,10 @@ function osd(str)
 end
 
 function log(str)
-    f = io.open(string.format("%s/cut.log", o.target_dir), "a")
+    local logpath = string.format("%s/%s",
+        o.target_dir:gsub("~", os.getenv("HOME")),
+        "mpv_slicing.log")
+    f = io.open(logpath, "a")
     f:write(string.format("# %s\n%s\n",
         os.date("%Y-%m-%d %H:%M:%S"),
         str))
@@ -54,7 +57,10 @@ function get_csp()
     if csp == "bt.601" then return "bt601"
         elseif csp == "bt.709" then return "bt709"
         elseif csp == "smpte-240m" then return "smpte240m"
-        else error("unknown colorspace " .. csp)
+        else
+            local err = "Unknown colorspace: " .. csp
+            osd(err)
+            error(err)
     end
 end
 

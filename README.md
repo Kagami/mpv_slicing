@@ -4,9 +4,9 @@
 
 Make sure you have FFmpeg installed. Put `slicing.lua` to `~/.config/mpv/scripts/` or `~/.mpv/scripts/` directory to autoload the script or load it manually with `--script=<path>`.
 
-Press `c` first time to mark the start of the fragment. Press it again to mark the end of the fragment and write it to the disk. Press `a` to toggle uncompressed audio capturing (default on). But default output videos will be placed in the home directory.
+Press `c` first time to mark the start of the fragment. Press it again to mark the end of the fragment and write it to the disk. Press `a` to toggle uncompressed audio capturing (default on). By default output videos will be placed in the home directory.
 
-You could change key bindings and all parameters of the output video by editing `input.conf` and `lua-settings/slicing.conf`, see [slicing.lua](https://github.com/Kagami/mpv_slicing/blob/master/slicing.lua) for details.
+You could change key bindings and all parameters of the output video by editing your `input.conf` and `lua-settings/slicing.conf`, see [slicing.lua](https://github.com/Kagami/mpv_slicing/blob/master/slicing.lua) for details.
 
 #### License
 

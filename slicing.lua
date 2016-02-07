@@ -45,7 +45,7 @@ function log(str)
 end
 
 function escape(str)
-    return str:gsub("'", "'\\''")
+    return str:gsub("\\", "\\\\"):gsub("'", "'\\''")
 end
 
 function trim(str)

@@ -15,7 +15,7 @@ local o = {
     opts = "",
     ext = "avi",
     command_template = [[
-        ffmpeg -v warning -y
+        ffmpeg -v warning -y -stats
         -ss $shift -i '$in' -t $duration
         -c:v $vcodec -c:a $acodec $audio
         -vf $prevf$vf$postvf $opts '$out.$ext'

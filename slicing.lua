@@ -9,7 +9,8 @@ local o = {
     vcodec = "rawvideo",
     acodec = "pcm_s16le",
     prevf = "",
-    vf = "format=yuv444p16,scale=in_color_matrix=$matrix,format=bgr24",
+    vf = "format=yuv444p16$hqvf,scale=in_color_matrix=$matrix,format=bgr24",
+    hqvf = "",
     postvf = "",
     opts = "",
     ext = "avi",
@@ -90,6 +91,7 @@ function cut(shift, endpos)
     cmd = cmd:gsub("$audio", copy_audio and "" or "-an")
     cmd = cmd:gsub("$prevf", o.prevf)
     cmd = cmd:gsub("$vf", o.vf)
+    cmd = cmd:gsub("$hqvf", o.hqvf)
     cmd = cmd:gsub("$postvf", o.postvf)
     cmd = cmd:gsub("$matrix", get_csp())
     cmd = cmd:gsub("$opts", o.opts)

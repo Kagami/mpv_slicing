@@ -34,9 +34,15 @@ function osd(str)
     return mp.osd_message(str, 3)
 end
 
+function get_home()
+  -- It would be better to do platform detection instead of fallback but
+  -- it's not that easy in Lua.
+  return os.getenv("HOME") or os.getenv("USERPROFILE") or ""
+end
+
 function log(str)
     local logpath = string.format("%s/%s",
-        o.target_dir:gsub("~", os.getenv("HOME")),
+        o.target_dir:gsub("~", get_home()),
         "mpv_slicing.log")
     f = io.open(logpath, "a")
     f:write(string.format("# %s\n%s\n",
@@ -79,9 +85,8 @@ function cut(shift, endpos)
     local inpath = escape(utils.join_path(
         utils.getcwd(),
         mp.get_property("stream-path")))
-    -- TODO: Windows?
     local outpath = escape(string.format("%s/%s",
-        o.target_dir:gsub("~", os.getenv("HOME")),
+        o.target_dir:gsub("~", get_home()),
         get_outname(shift, endpos)))
 
     cmd = cmd:gsub("$shift", shift)

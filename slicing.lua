@@ -34,15 +34,15 @@ function osd(str)
     return mp.osd_message(str, 3)
 end
 
-function get_home()
+function get_homedir()
   -- It would be better to do platform detection instead of fallback but
   -- it's not that easy in Lua.
   return os.getenv("HOME") or os.getenv("USERPROFILE") or ""
 end
 
 function log(str)
-    local logpath = string.format("%s/%s",
-        o.target_dir:gsub("~", get_home()),
+    local logpath = utils.join_path(
+        o.target_dir:gsub("~", get_homedir()),
         "mpv_slicing.log")
     f = io.open(logpath, "a")
     f:write(string.format("# %s\n%s\n",
@@ -52,7 +52,10 @@ function log(str)
 end
 
 function escape(str)
-    return str:gsub("\\", "\\\\"):gsub("'", "'\\''")
+    -- FIXME(Kagami): This escaping is NOT enough, see e.g.
+    -- https://stackoverflow.com/a/31413730
+    -- Consider using `utils.subprocess` instead.
+    return str:gsub("\\", "\\\\"):gsub('"', '\\"')
 end
 
 function trim(str)
@@ -86,8 +89,8 @@ function cut(shift, endpos)
     local inpath = escape(utils.join_path(
         utils.getcwd(),
         mp.get_property("stream-path")))
-    local outpath = escape(string.format("%s/%s",
-        o.target_dir:gsub("~", get_home()),
+    local outpath = escape(utils.join_path(
+        o.target_dir:gsub("~", get_homedir()),
         get_outname(shift, endpos)))
 
     cmd = cmd:gsub("$shift", shift)

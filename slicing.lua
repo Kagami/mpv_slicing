@@ -16,9 +16,9 @@ local o = {
     ext = "avi",
     command_template = [[
         ffmpeg -v warning -y -stats
-        -ss $shift -i '$in' -t $duration
+        -ss $shift -i "$in" -t $duration
         -c:v $vcodec -c:a $acodec $audio
-        -vf $prevf$vf$postvf $opts '$out.$ext'
+        -vf $prevf$vf$postvf $opts "$out.$ext"
     ]],
 }
 options.read_options(o)
@@ -76,6 +76,7 @@ function get_outname(shift, endpos)
     local dotidx = name:reverse():find(".", 1, true)
     if dotidx then name = name:sub(1, -dotidx-1) end
     name = name:gsub(" ", "_")
+    name = name:gsub(":", "-")
     name = name .. string.format(".%s-%s", timestamp(shift), timestamp(endpos))
     return name
 end

@@ -34,17 +34,6 @@ function get_homedir()
   return os.getenv("HOME") or os.getenv("USERPROFILE") or ""
 end
 
-function log(str)
-    local logpath = utils.join_path(
-        o.target_dir:gsub("~", get_homedir()),
-        "mpv_slicing.log")
-    f = io.open(logpath, "a")
-    f:write(string.format("# %s\n%s\n",
-        os.date("%Y-%m-%d %H:%M:%S"),
-        str))
-    f:close()
-end
-
 function escape(str)
     -- FIXME(Kagami): This escaping is NOT enough, see e.g.
     -- https://stackoverflow.com/a/31413730

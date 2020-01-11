@@ -14,6 +14,7 @@ You could change key bindings and all parameters of the output video by editing 
 mpv_slicing - Cut video fragments with mpv
 
 Written in 2015 by Kagami Hiiragi <kagami@genshiken.org>
+
 Modified in 2019 by Snylonue <snylonue@gmail.com>
 
 To the extent possible under law, the author(s) have dedicated all copyright and related and neighboring rights to this software to the public domain worldwide. This software is distributed without any warranty.

@@ -4,16 +4,20 @@ local options = require "mp.options"
 
 local cut_pos = nil
 local copy_audio = true
+local command_template = {
+    ss = "$shift",
+    i = "$in",
+    t = "$duration",
+    c = {
+        v = "$vcodec",
+        a = "$acodec",
+    },
+    o = "$out.$ext",
+}
 local o = {
-    target_dir = "~",
+    ffmpeg_path = "ffmpeg",
     vcodec = "copy",
     acodec = "copy",
-    command_template = [[
-        ffmpeg -v warning -y -stats
-        -ss $shift -i "$in" -t $duration
-        -c:v $vcodec -c:a $acodec $audio
-         "$out.$ext"
-    ]],
 }
 options.read_options(o)
 
@@ -31,12 +35,6 @@ function get_homedir()
     -- it's not that easy in Lua.
     return os.getenv("HOME") or os.getenv("USERPROFILE") or ""
 end
-function escape(str)
-    -- FIXME(Kagami): This escaping is NOT enough, see e.g.
-    -- https://stackoverflow.com/a/31413730
-    -- Consider using `utils.subprocess` instead.
-    return str:gsub("\\", "\\\\"):gsub('"', '\\"')
-end
 function trim(str)
     return str:gsub("^%s+", ""):gsub("%s+$", "")
 end
@@ -50,26 +48,47 @@ function get_outname(shift, endpos)
     return name
 end
 function cut(shift, endpos)
-    local cmd = trim(o.command_template:gsub("%s+", " "))
-    local inpath = escape(utils.join_path(
+    local inpath = utils.join_path(
         utils.getcwd(),
-        mp.get_property("stream-path")))
-    local outpath = escape(utils.join_path(
-        o.target_dir:gsub("~", get_homedir()),
-        -- or use target_dir directly
-        -- o.target_dir,
-        get_outname(shift, endpos)))
-    cmd = cmd:gsub("$shift", shift)
-    cmd = cmd:gsub("$duration", endpos - shift)
-    cmd = cmd:gsub("$vcodec", o.vcodec)
-    cmd = cmd:gsub("$acodec", o.acodec)
-    cmd = cmd:gsub("$audio", copy_audio and "" or "-an")
-    cmd = cmd:gsub("$ext", mp.get_property("file-format"))
-    cmd = cmd:gsub("$out", outpath)
-    cmd = cmd:gsub("$in", inpath, 1)
-
-    msg.info(cmd)
-    os.execute(cmd)
+        mp.get_property("stream-path")
+    )
+    local outpath = utils.join_path(
+        get_homedir(),
+        get_outname(shift, endpos)
+    )
+    local cmds = {
+        o.ffmpeg_path,
+        "-v", "warning",
+        "-y",
+        "-stats",
+        "-ss", command_template.ss:gsub("$shift", shift),
+        "-i", command_template.i:gsub("$in", inpath, 1),
+        "-t", command_template.t:gsub("$duration", endpos - shift),
+        "-c:v", command_template.c.v:gsub("$vcodec", o.vcodec),
+        "-c:a", command_template.c.a:gsub("$acodec", o.acodec),
+        copy_audio and "" or "-an",
+        command_template.o:gsub("$out", outpath):gsub("$ext", mp.get_property("file-format"))
+    }
+    for i, v in ipairs(cmds) do
+        if v == "" then
+            table.remove(cmds, i)
+            break
+        end
+    end
+    -- there is a strange number 1 at the end of the array
+    table.remove(cmds)
+    msg.debug("Run commands: " .. table.concat(cmds, " "))
+    local res, err = mp.command_native({
+        name = "subprocess",
+        args = cmds,
+        capture_stdout = true,
+        capture_stderr = true,
+    })
+    if err then
+        msg.error("Failed to run command: " .. utils.to_string(err))
+    else
+        msg.info("Run command successfully: " .. res.stderr:gsub("^%s*(.-)%s*$", "%1"))
+    end
 end
 function toggle_mark()
     local pos = mp.get_property_number("time-pos")
@@ -83,9 +102,7 @@ function toggle_mark()
                 osd("Cut fragment is empty")
             else
                 cut_pos = nil
-                osd(string.format("Cut fragment: %s-%s",
-                    timestamp(shift),
-                    timestamp(endpos)))
+                osd(string.format("Cut fragment: %s-%s", timestamp(shift), timestamp(endpos)))
                 cut(shift, endpos)
             end
         else

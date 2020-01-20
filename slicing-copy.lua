@@ -16,29 +16,31 @@ local command_template = {
 }
 local o = {
     ffmpeg_path = "ffmpeg",
+    -- make sure the dir is exist. The script will not check it
+    target_dir = "~~/cutfragments",
     vcodec = "copy",
     acodec = "copy",
 }
 options.read_options(o)
 
-function timestamp(duration)
+local function timestamp(duration)
     local hours = duration / 3600
     local minutes = duration % 3600 / 60
     local seconds = duration % 60
     return string.format("%02d:%02d:%02.03f", hours, minutes, seconds)
 end
-function osd(str)
+local function osd(str)
     return mp.osd_message(str, 3)
 end
-function get_homedir()
+local function get_homedir()
     -- It would be better to do platform detection instead of fallback but
     -- it's not that easy in Lua.
     return os.getenv("HOME") or os.getenv("USERPROFILE") or ""
 end
-function trim(str)
+local function trim(str)
     return str:gsub("^%s+", ""):gsub("%s+$", "")
 end
-function get_outname(shift, endpos)
+local function get_outname(shift, endpos)
     local name = mp.get_property("filename")
     local dotidx = name:reverse():find(".", 1, true)
     if dotidx then name = name:sub(1, -dotidx-1) end
@@ -47,13 +49,13 @@ function get_outname(shift, endpos)
     name = name:gsub(":", "-")
     return name
 end
-function cut(shift, endpos)
+local function cut(shift, endpos)
     local inpath = utils.join_path(
         utils.getcwd(),
         mp.get_property("stream-path")
     )
     local outpath = utils.join_path(
-        get_homedir(),
+        o.target_dir:gsub("~~", mp.command_native({ "expand-path", "~~home/" })),
         get_outname(shift, endpos)
     )
     local cmds = {
@@ -91,7 +93,7 @@ function cut(shift, endpos)
         msg.info("Run commands successfully: " .. res.stderr:gsub("^%s*(.-)%s*$", "%1"))
     end
 end
-function toggle_mark()
+local function toggle_mark()
     local pos = mp.get_property_number("time-pos")
     if pos then
         if cut_pos then
@@ -114,11 +116,11 @@ function toggle_mark()
         msg.error("Failed to get timestamp")
     end
 end
-function toggle_audio()
+local function toggle_audio()
     copy_audio = not copy_audio
     osd("Audio capturing is " .. (copy_audio and "enabled" or "disabled"))
 end
-function clear_toggle_mark()
+local function clear_toggle_mark()
     cut_pos = nil
     osd("Cut fragment is cleared")
 end

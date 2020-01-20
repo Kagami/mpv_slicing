@@ -76,6 +76,7 @@ function cut(shift, endpos)
         end
     end
     -- there is a strange number 1 at the end of the array
+    -- remove it
     table.remove(cmds)
     msg.debug("Run commands: " .. table.concat(cmds, " "))
     local res, err = mp.command_native({
@@ -85,9 +86,9 @@ function cut(shift, endpos)
         capture_stderr = true,
     })
     if err then
-        msg.error("Failed to run command: " .. utils.to_string(err))
+        msg.error("Failed to run commands: " .. utils.to_string(err))
     else
-        msg.info("Run command successfully: " .. res.stderr:gsub("^%s*(.-)%s*$", "%1"))
+        msg.info("Run commands successfully: " .. res.stderr:gsub("^%s*(.-)%s*$", "%1"))
     end
 end
 function toggle_mark()

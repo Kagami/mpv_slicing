@@ -24,24 +24,24 @@ local function timestamp(duration)
     local seconds = duration % 60
     return string.format("%02d:%02d:%02.03f", hours, minutes, seconds)
 end
+
 local function osd(str)
     return mp.osd_message(str, 3)
 end
+
 local function replace(str, from, to)
-    local res, _ = str:gsub(from, to)
+    local res = str:gsub(from, to)
     return res
 end
-local function trim(str)
-    return str:gsub("^%s+", ""):gsub("%s+$", "")
-end
+
 local function get_outname(shift, endpos)
     local name = mp.get_property("filename/no-ext")
-    name = name:gsub(" ", "_")
-    name = name .. "_" .. string.format("%s-%s", timestamp(shift), timestamp(endpos))
-    name = name:gsub(":", "-")
     local fmt = mp.get_property("file-format")
+    name = string.format("%s_%s-%s", name, timestamp(shift), timestamp(endpos))
+    name = name:gsub(":", "-")
     return string.format("%s.%s", name, fmt)
 end
+
 local function cut(shift, endpos)
     local inpath = utils.join_path(
         utils.getcwd(),
@@ -79,6 +79,7 @@ local function cut(shift, endpos)
         msg.info(res.stderr:gsub("^%s*(.-)%s*$", "%1"))
     end
 end
+
 local function toggle_mark()
     local pos = mp.get_property_number("time-pos")
     if pos then
@@ -102,10 +103,12 @@ local function toggle_mark()
         msg.error("Failed to get timestamp")
     end
 end
+
 local function toggle_audio()
     copy_audio = not copy_audio
     osd("Audio capturing is " .. (copy_audio and "enabled" or "disabled"))
 end
+
 local function clear_toggle_mark()
     cut_pos = nil
     osd("Cut fragment is cleared")

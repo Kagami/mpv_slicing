@@ -32,10 +32,9 @@ end
 local function osd(str)
     return mp.osd_message(str, 3)
 end
-local function get_homedir()
-    -- It would be better to do platform detection instead of fallback but
-    -- it's not that easy in Lua.
-    return os.getenv("HOME") or os.getenv("USERPROFILE") or ""
+local function replace(str, from, to)
+    local res, _ = str:gsub(from, to)
+    return res
 end
 local function trim(str)
     return str:gsub("^%s+", ""):gsub("%s+$", "")
@@ -55,7 +54,7 @@ local function cut(shift, endpos)
         mp.get_property("stream-path")
     )
     local outpath = utils.join_path(
-        o.target_dir:gsub("~~", mp.command_native({ "expand-path", "~~home/" })),
+        mp.command_native({ "expand-path", replace(o.target_dir, '"', "") }),
         get_outname(shift, endpos)
     )
     local cmds = {

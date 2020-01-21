@@ -8,11 +8,6 @@ local command_template = {
     ss = "$shift",
     i = "$in",
     t = "$duration",
-    c = {
-        v = "$vcodec",
-        a = "$acodec",
-    },
-    o = "$out.$ext",
 }
 local o = {
     ffmpeg_path = "ffmpeg",
@@ -40,13 +35,12 @@ local function trim(str)
     return str:gsub("^%s+", ""):gsub("%s+$", "")
 end
 local function get_outname(shift, endpos)
-    local name = mp.get_property("filename")
-    local dotidx = name:reverse():find(".", 1, true)
-    if dotidx then name = name:sub(1, -dotidx-1) end
+    local name = mp.get_property("filename/no-ext")
     name = name:gsub(" ", "_")
     name = name .. "_" .. string.format("%s-%s", timestamp(shift), timestamp(endpos))
     name = name:gsub(":", "-")
-    return name
+    local fmt = mp.get_property("file-format")
+    return string.format("%s.%s", name, fmt)
 end
 local function cut(shift, endpos)
     local inpath = utils.join_path(
@@ -65,20 +59,13 @@ local function cut(shift, endpos)
         "-ss", command_template.ss:gsub("$shift", shift),
         "-i", command_template.i:gsub("$in", inpath, 1),
         "-t", command_template.t:gsub("$duration", endpos - shift),
-        "-c:v", command_template.c.v:gsub("$vcodec", o.vcodec),
-        "-c:a", command_template.c.a:gsub("$acodec", o.acodec),
-        copy_audio and "" or "-an",
-        command_template.o:gsub("$out", outpath):gsub("$ext", mp.get_property("file-format"))
+        "-c:v", o.vcodec,
+        "-c:a", o.acodec,
     }
-    for i, v in ipairs(cmds) do
-        if v == "" then
-            table.remove(cmds, i)
-            break
-        end
+    if not copy_audio then
+        table.insert(cmds, "-an")
     end
-    -- there is a strange number 1 at the end of the array
-    -- remove it
-    table.remove(cmds)
+    table.insert(cmds, outpath)
     msg.debug("Run commands: " .. table.concat(cmds, " "))
     local res, err = mp.command_native({
         name = "subprocess",
@@ -87,9 +74,9 @@ local function cut(shift, endpos)
         capture_stderr = true,
     })
     if err then
-        msg.error("Failed to run commands: " .. utils.to_string(err))
+        msg.error(utils.to_string(err))
     else
-        msg.info("Run commands successfully: " .. res.stderr:gsub("^%s*(.-)%s*$", "%1"))
+        msg.info(res.stderr:gsub("^%s*(.-)%s*$", "%1"))
     end
 end
 local function toggle_mark()

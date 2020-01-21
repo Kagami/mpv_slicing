@@ -66,7 +66,7 @@ local function cut(shift, endpos)
         table.insert(cmds, "-an")
     end
     table.insert(cmds, outpath)
-    msg.debug("Run commands: " .. table.concat(cmds, " "))
+    msg.info("Run commands: " .. table.concat(cmds, " "))
     local res, err = mp.command_native({
         name = "subprocess",
         args = cmds,

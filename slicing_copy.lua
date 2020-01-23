@@ -6,7 +6,6 @@ local cut_pos = nil
 local copy_audio = true
 local command_template = {
     ss = "$shift",
-    i = "$in",
     t = "$duration",
 }
 local o = {
@@ -43,12 +42,9 @@ local function get_outname(shift, endpos)
 end
 
 local function cut(shift, endpos)
-    local inpath = utils.join_path(
-        utils.getcwd(),
-        mp.get_property("stream-path")
-    )
+    local inpath = mp.get_property("stream-open-filename")
     local outpath = utils.join_path(
-        mp.command_native({ "expand-path", replace(o.target_dir, '"', "") }),
+        mp.command_native({"expand-path", replace(o.target_dir, '"', "")}),
         get_outname(shift, endpos)
     )
     local cmds = {
@@ -57,7 +53,7 @@ local function cut(shift, endpos)
         "-y",
         "-stats",
         "-ss", command_template.ss:gsub("$shift", shift),
-        "-i", command_template.i:gsub("$in", inpath, 1),
+        "-i", inpath,
         "-t", command_template.t:gsub("$duration", endpos - shift),
         "-c:v", o.vcodec,
         "-c:a", o.acodec,
@@ -76,7 +72,7 @@ local function cut(shift, endpos)
     if err then
         msg.error(utils.to_string(err))
     else
-        msg.info(res.stderr:gsub("^%s*(.-)%s*$", "%1"))
+        msg.info((res.stderr:gsub("^%s*(.-)%s*$", "%1")))
     end
 end
 

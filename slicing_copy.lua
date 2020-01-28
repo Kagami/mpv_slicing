@@ -77,7 +77,7 @@ local function cut(shift, endpos)
 end
 
 local function toggle_mark()
-    local pos = mp.get_property_number("time-pos")
+    local pos, err = mp.get_property_number("time-pos")
     if pos then
         if cut_pos then
             local shift, endpos = cut_pos, pos
@@ -96,7 +96,7 @@ local function toggle_mark()
             osd(string.format("Marked %s as start position", timestamp(pos)))
         end
     else
-        msg.error("Failed to get timestamp")
+        msg.error("Failed to get timestamp: " .. err)
     end
 end
 
@@ -107,7 +107,7 @@ end
 
 local function clear_toggle_mark()
     cut_pos = nil
-    osd("Cut fragment is cleared")
+    osd("Cleared cut fragment")
 end
 
 mp.add_key_binding("c", "slicing_mark", toggle_mark)

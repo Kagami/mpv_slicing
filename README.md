@@ -16,7 +16,7 @@ You could change key bindings and all parameters of the output video by editing 
 Online videos are not supported.  
 
 Output videos will be placed in `cutfragments` in mpv configuration directory by default instead of the home directory since [commit 7b3ef36](https://github.com/snylonue/mpv_slicing_copy/commit/7b3ef36fbe854f238e296a8b16af25bc281142c9).  
-However, the script will not check if the directory is exist because it's not easy in lua. But you still could change the directory by editing script-opts/slicing_copy.conf or source code (option `target_dir`).
+However, the script will not check if the directory is exist because it's not easy in lua. But you still could change the directory by editing `script-opts/slicing_copy.conf` or [source code](slicing_copy.lua) (option `target_dir`).
 
 #### License
 

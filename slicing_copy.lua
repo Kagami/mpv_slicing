@@ -15,7 +15,6 @@ local o = {
     vcodec = "copy",
     acodec = "copy",
 }
-options.read_options(o)
 
 local function timestamp(duration)
     local hours = duration / 3600
@@ -26,11 +25,6 @@ end
 
 local function osd(str)
     return mp.osd_message(str, 3)
-end
-
-local function replace(str, from, to)
-    local res = str:gsub(from, to)
-    return res
 end
 
 local function get_outname(shift, endpos)
@@ -44,7 +38,7 @@ end
 local function cut(shift, endpos)
     local inpath = mp.get_property("stream-open-filename")
     local outpath = utils.join_path(
-        mp.command_native({"expand-path", replace(o.target_dir, '"', "")}),
+        o.target_dir,
         get_outname(shift, endpos)
     )
     local cmds = {
@@ -96,6 +90,7 @@ local function toggle_mark()
             osd(string.format("Marked %s as start position", timestamp(pos)))
         end
     else
+        osd("Failed to get timestamp")
         msg.error("Failed to get timestamp: " .. err)
     end
 end
@@ -110,6 +105,8 @@ local function clear_toggle_mark()
     osd("Cleared cut fragment")
 end
 
+options.read_options(o)
+o.target_dir = mp.command_native({"expand-path", (o.target_dir:gsub('"', ""))})
 mp.add_key_binding("c", "slicing_mark", toggle_mark)
 mp.add_key_binding("a", "slicing_audio", toggle_audio)
 mp.add_key_binding("C", "clear_slicing_mark", clear_toggle_mark)

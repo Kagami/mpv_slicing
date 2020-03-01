@@ -17,8 +17,8 @@ local o = {
 }
 
 local function timestamp(duration)
-    local hours = duration / 3600
-    local minutes = duration % 3600 / 60
+    local hours = math.floor(duration / 3600)
+    local minutes = math.floor(duration % 3600 / 60)
     local seconds = duration % 60
     return string.format("%02d:%02d:%02.03f", hours, minutes, seconds)
 end

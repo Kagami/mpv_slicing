@@ -5,7 +5,7 @@ The script is for mpv to cut fragments of the video.
 
 Make sure you have FFmpeg installed. Put `slicing_copy.lua` to `~/.config/mpv/scripts/` or `~/.mpv/scripts/` directory to autoload the script or load it manually with `--script=<path>`.
 
-Press `c` first time to mark the start of the fragment. Press it again to mark the end of the fragment and write it to the disk. Press `C` to clear the fragment. Press `a` to toggle uncompressed audio capturing (default on).
+Press `c` first time to mark the start of the fragment. Press it again to mark the end of the fragment and write it to the disk. Press `C` to clear the fragment. Press `a` to toggle audio capturing (default on).
 
 You could find some logs in console (press `~` to open and `esc` to close by default), there might be something useful.
 

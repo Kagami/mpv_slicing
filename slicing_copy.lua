@@ -16,6 +16,31 @@ local o = {
     acodec = "copy",
 }
 
+Command = { name = "", args = {""} }
+
+function Command:new(name)
+    local o = {}
+    setmetatable(o, self)
+    self.__index = self
+    if name then
+        o.name = name
+        o.args[1] = name
+    end
+    return o
+end
+function Command:arg(...)
+    for _, v in ipairs({...}) do
+        self.args[#self.args + 1] = v
+    end
+    return self
+end
+function Command:as_array()
+    return self.args
+end
+function Command:as_str()
+    return table.concat(self.args, " ")
+end
+
 local function timestamp(duration)
     local hours = math.floor(duration / 3600)
     local minutes = math.floor(duration % 3600 / 60)
@@ -41,25 +66,21 @@ local function cut(shift, endpos)
         o.target_dir,
         get_outname(shift, endpos)
     )
-    local cmds = {
-        o.ffmpeg_path,
-        "-v", "warning",
-        "-y",
-        "-stats",
-        "-ss", command_template.ss:gsub("$shift", shift),
-        "-i", inpath,
-        "-t", command_template.t:gsub("$duration", endpos - shift),
-        "-c:v", o.vcodec,
-        "-c:a", o.acodec,
-    }
-    if not copy_audio then
-        table.insert(cmds, "-an")
-    end
-    table.insert(cmds, outpath)
-    msg.info("Run commands: " .. table.concat(cmds, " "))
+    local cmds = Command:new(o.ffmpeg_path)
+        :arg("-v", "warning")
+        :arg("-y")
+        :arg("-stats")
+        :arg("-ss", (command_template.ss:gsub("$shift", shift)))
+        :arg("-i", inpath)
+        :arg("-t", (command_template.t:gsub("$duration", endpos - shift)))
+        :arg("-c:v", o.vcodec)
+        :arg("-c:a", o.acodec)
+        :arg((copy_audio and {nil} or {"-an"})[1])
+        :arg(outpath)
+    msg.info("Run commands: " .. cmds:as_str())
     local res, err = mp.command_native({
         name = "subprocess",
-        args = cmds,
+        args = cmds:as_array(),
         capture_stdout = true,
         capture_stderr = true,
     })

@@ -66,11 +66,19 @@ local function cut(shift, endpos)
         o.target_dir,
         get_outname(shift, endpos)
     )
+    local ua = mp.get_property('user-agent')
+    local referer = mp.get_property('referrer')
     local cmds = Command:new(o.ffmpeg_path)
         :arg("-v", "warning")
         :arg("-y")
         :arg("-stats")
-        :arg("-ss", (command_template.ss:gsub("$shift", shift)))
+    if ua then
+        cmds:arg('-user_agent', ua)
+    end
+    if referer then
+        cmds:arg('-referer', referer)
+    end
+    cmds:arg("-ss", (command_template.ss:gsub("$shift", shift)))
         :arg("-i", inpath)
         :arg("-t", (command_template.t:gsub("$duration", endpos - shift)))
         :arg("-c:v", o.vcodec)

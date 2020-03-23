@@ -93,27 +93,26 @@ end
 
 local function toggle_mark()
     local pos, err = mp.get_property_number("time-pos")
-    if pos then
-        if cut_pos then
-            local shift, endpos = cut_pos, pos
-            if shift > endpos then
-                shift, endpos = endpos, shift
-            end
-            if shift == endpos then
-                osd("Cut fragment is empty")
-            else
-                cut_pos = nil
-                osd(string.format("Cut fragment: %s-%s", timestamp(shift), timestamp(endpos)))
-                cut(shift, endpos)
-            end
-        else
-            cut_pos = pos
-            osd(string.format("Marked %s as start position", timestamp(pos)))
-        end
-    else
+    if not pos then
         osd("Failed to get timestamp")
         msg.error("Failed to get timestamp: " .. err)
+        return
     end
+    if cut_pos then
+        local shift, endpos = cut_pos, pos
+        if shift > endpos then
+            shift, endpos = endpos, shift
+        elseif shift == endpos then
+            osd("Cut fragment is empty")
+        else
+            cut_pos = nil
+            osd(string.format("Cut fragment: %s-%s", timestamp(shift), timestamp(endpos)))
+            cut(shift, endpos)
+        end
+    else
+        cut_pos = pos
+        osd(string.format("Marked %s as start position", timestamp(pos)))
+    end    
 end
 
 local function toggle_audio()
@@ -127,7 +126,7 @@ local function clear_toggle_mark()
 end
 
 options.read_options(o)
-o.target_dir = mp.command_native({"expand-path", (o.target_dir:gsub('"', ""))})
+o.target_dir = mp.command_native({ "expand-path", (o.target_dir:gsub('"', "")) })
 mp.add_key_binding("c", "slicing_mark", toggle_mark)
 mp.add_key_binding("a", "slicing_audio", toggle_audio)
 mp.add_key_binding("C", "clear_slicing_mark", clear_toggle_mark)

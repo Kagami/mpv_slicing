@@ -9,15 +9,15 @@ Press `c` first time to mark the start of the fragment. Press it again to mark t
 
 You could find some logs in console (press `~` to open and `esc` to close by default), there might be something useful.
 
-You could change key bindings and all parameters of the output video by editing your `input.conf` and `script-opts/slicing_copy.conf`, see [slicing_copy.lua](slicing_copy.lua) and [mpv reference](https://mpv.io/manual/master/#lua-scripting-on-update]]\)) for details.
+You could change key bindings and all parameters of the output video by editing your `input.conf` and `script-opts/slicing_copy.conf`, see [slicing_copy.lua](slicing_copy.lua) and [mpv manual](https://mpv.io/manual/master/#lua-scripting-on-update]]\)) for details.
 
 #### Limitation
 
 If `--merge-files` is passed to mpv, the script won't work.
 
-The script will pass `-referer` and `-user_agent` from mpv to ffmpeg to support some online videos(since [`commit f9248e`](https://github.com/snylonue/mpv_slicing_copy/commit/f9248e452d4f50e13152169c7417cb6003e6925d), but you may get some unfriendly filenames.
+The script will pass `-referer` and `-user_agent` from mpv to ffmpeg to support some online videos (since commit [`f9248e4`](https://github.com/snylonue/mpv_slicing_copy/commit/f9248e452d4f50e13152169c7417cb6003e6925d)), but you may get some unfriendly filenames.
 
-Output videos will be placed in `cutfragments` in mpv configuration directory by default instead of the home directory since [`commit 7b3ef36`](https://github.com/snylonue/mpv_slicing_copy/commit/7b3ef36fbe854f238e296a8b16af25bc281142c9).  
+Output videos will be placed in `cutfragments` in mpv configuration directory by default instead of the home directory since commit [`7b3ef36`](https://github.com/snylonue/mpv_slicing_copy/commit/7b3ef36fbe854f238e296a8b16af25bc281142c9).  
 However, the script will not check if the directory is exist because it's not easy in lua. FFmpeg will not check or create it either. But you could still change the directory by editing `script-opts/slicing_copy.conf` or [source code](slicing_copy.lua) (option `target_dir`).
 
 #### License

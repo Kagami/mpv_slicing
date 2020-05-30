@@ -41,6 +41,15 @@ function Command:as_str()
     return table.concat(self.args, " ")
 end
 
+local function file_format()
+    local fmt = mp.get_property("file-format")
+    if not fmt:find(',') then
+        return fmt
+    end
+    local filename = mp.get_property('filename')
+    local name = mp.get_property('filename/no-ext')
+    return filename:sub(name:len() + 2)
+end
 local function timestamp(duration)
     local hours = math.floor(duration / 3600)
     local minutes = math.floor(duration % 3600 / 60)
@@ -54,7 +63,7 @@ end
 
 local function get_outname(shift, endpos)
     local name = mp.get_property("filename/no-ext")
-    local fmt = mp.get_property("file-format")
+    local fmt = file_format()
     name = string.format("%s_%s-%s", name, timestamp(shift), timestamp(endpos))
     name = name:gsub(":", "-")
     return string.format("%s.%s", name, fmt)

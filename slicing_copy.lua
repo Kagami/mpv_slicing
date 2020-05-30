@@ -81,10 +81,10 @@ local function cut(shift, endpos)
         :arg("-v", "warning")
         :arg("-y")
         :arg("-stats")
-    if ua then
+    if ua and ua ~= '' and ua ~= 'libmpv' then
         cmds:arg('-user_agent', ua)
     end
-    if referer then
+    if referer and referer ~= '' then
         cmds:arg('-referer', referer)
     end
     cmds:arg("-ss", (command_template.ss:gsub("$shift", shift)))

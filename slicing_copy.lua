@@ -123,11 +123,11 @@ local function toggle_mark()
             shift, endpos = endpos, shift
         elseif shift == endpos then
             osd("Cut fragment is empty")
-        else
-            cut_pos = nil
-            osd(string.format("Cut fragment: %s-%s", timestamp(shift), timestamp(endpos)))
-            cut(shift, endpos)
+            return
         end
+        cut_pos = nil
+        osd(string.format("Cut fragment: %s-%s", timestamp(shift), timestamp(endpos)))
+        cut(shift, endpos)
     else
         cut_pos = pos
         osd(string.format("Marked %s as start position", timestamp(pos)))

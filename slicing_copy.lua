@@ -16,12 +16,14 @@ local o = {
     acodec = "copy",
 }
 
-Command = { name = "", args = {""} }
+Command = { }
 
 function Command:new(name)
     local o = {}
     setmetatable(o, self)
     self.__index = self
+    o.name = ""
+    o.args = { "" }
     if name then
         o.name = name
         o.args[1] = name

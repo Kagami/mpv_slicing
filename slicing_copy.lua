@@ -42,10 +42,6 @@ function Command:as_str()
     return table.concat(self.args, " ")
 end
 
-local function info(s)
-    msg.info(s)
-    osd(s)
-end
 local function file_format()
     local fmt = mp.get_property("file-format")
     if not fmt:find(',') then
@@ -55,6 +51,7 @@ local function file_format()
     local name = mp.get_property('filename/no-ext')
     return filename:sub(name:len() + 2)
 end
+
 local function timestamp(duration)
     local hours = math.floor(duration / 3600)
     local minutes = math.floor(duration % 3600 / 60)
@@ -64,6 +61,11 @@ end
 
 local function osd(str)
     return mp.osd_message(str, 3)
+end
+
+local function info(s)
+    msg.info(s)
+    osd(s)
 end
 
 local function get_outname(shift, endpos)
@@ -108,8 +110,9 @@ local function cut(shift, endpos)
     })
     if err then
         msg.error(utils.to_string(err))
-    else
-        msg.info((res.stderr:gsub("^%s*(.-)%s*$", "%1")))
+    elseif res.stderr ~= "" or res.stdout ~= "" then
+        msg.info("stderr: " .. (res.stderr:gsub("^%s*(.-)%s*$", "%1"))) -- trim stderr
+        msg.info("stdout: " .. (res.stdout:gsub("^%s*(.-)%s*$", "%1"))) -- trim stdout
     end
 end
 

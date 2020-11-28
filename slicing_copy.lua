@@ -43,6 +43,10 @@ function Command:as_str()
     return table.concat(self.args, " ")
 end
 
+local function info(s)
+    msg.info(s)
+    osd(s)
+end
 local function file_format()
     local fmt = mp.get_property("file-format")
     if not fmt:find(',') then
@@ -126,22 +130,22 @@ local function toggle_mark()
             return
         end
         cut_pos = nil
-        osd(string.format("Cut fragment: %s-%s", timestamp(shift), timestamp(endpos)))
+        info(string.format("Cut fragment: %s-%s", timestamp(shift), timestamp(endpos)))
         cut(shift, endpos)
     else
         cut_pos = pos
-        osd(string.format("Marked %s as start position", timestamp(pos)))
+        info(string.format("Marked %s as start position", timestamp(pos)))
     end    
 end
 
 local function toggle_audio()
     copy_audio = not copy_audio
-    osd("Audio capturing is " .. (copy_audio and "enabled" or "disabled"))
+    info("Audio capturing is " .. (copy_audio and "enabled" or "disabled"))
 end
 
 local function clear_toggle_mark()
     cut_pos = nil
-    osd("Cleared cut fragment")
+    info("Cleared cut fragment")
 end
 
 options.read_options(o)

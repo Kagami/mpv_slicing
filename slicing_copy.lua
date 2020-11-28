@@ -10,7 +10,6 @@ local command_template = {
 }
 local o = {
     ffmpeg_path = "ffmpeg",
-    -- make sure the dir is exist. The script will not check it
     target_dir = "~~/cutfragments",
     vcodec = "copy",
     acodec = "copy",
@@ -149,7 +148,14 @@ local function clear_toggle_mark()
 end
 
 options.read_options(o)
-o.target_dir = mp.command_native({ "expand-path", (o.target_dir:gsub('"', "")) })
+o.target_dir = o.target_dir:gsub('"', "")
+file, _ = utils.file_info(mp.command_native({ "expand-path", o.target_dir }))
+if not file then
+    msg.warn(string.format("target_dir `%s` may not exist", o.target_dir))
+elseif not file.is_dir then
+    msg.warn(string.format("target_dir `%s` is a file", o.target_dir))
+end
+o.target_dir = mp.command_native({ "expand-path", o.target_dir })
 mp.add_key_binding("c", "slicing_mark", toggle_mark)
 mp.add_key_binding("a", "slicing_audio", toggle_audio)
 mp.add_key_binding("C", "clear_slicing_mark", clear_toggle_mark)

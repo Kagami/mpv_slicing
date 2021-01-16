@@ -11,6 +11,7 @@ local command_template = {
 local o = {
     ffmpeg_path = "ffmpeg",
     target_dir = "~~/cutfragments",
+    overwrite = false, -- whether to overwrite exist files
     vcodec = "copy",
     acodec = "copy",
 }
@@ -92,7 +93,7 @@ local function cut(shift, endpos)
     local referer = mp.get_property('referrer')
     local cmds = Command:new(o.ffmpeg_path)
         :arg("-v", "warning")
-        :arg("-y")
+        :arg(o.overwrite and "-y" or "-n")
         :arg("-stats")
     if ua and ua ~= '' and ua ~= 'libmpv' then
         cmds:arg('-user_agent', ua)

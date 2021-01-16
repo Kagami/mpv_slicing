@@ -35,11 +35,17 @@ function Command:arg(...)
     end
     return self
 end
-function Command:as_array()
-    return self.args
-end
 function Command:as_str()
     return table.concat(self.args, " ")
+end
+function Command:run()
+    local res, err = mp.command_native({
+        name = "subprocess",
+        args = self.args,
+        capture_stdout = true,
+        capture_stderr = true,
+    })
+    return res, err
 end
 
 local function file_format()
@@ -102,12 +108,7 @@ local function cut(shift, endpos)
         :arg((copy_audio and {nil} or {"-an"})[1])
         :arg(outpath)
     msg.info("Run commands: " .. cmds:as_str())
-    local res, err = mp.command_native({
-        name = "subprocess",
-        args = cmds:as_array(),
-        capture_stdout = true,
-        capture_stderr = true,
-    })
+    local res, err = cmds:run()
     if err then
         msg.error(utils.to_string(err))
     elseif res.stderr ~= "" or res.stdout ~= "" then

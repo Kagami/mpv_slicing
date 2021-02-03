@@ -78,9 +78,8 @@ end
 local function get_outname(shift, endpos)
     local name = mp.get_property("filename/no-ext")
     local fmt = file_format()
-    name = string.format("%s_%s-%s", name, timestamp(shift), timestamp(endpos))
-    name = name:gsub(":", "-")
-    return string.format("%s.%s", name, fmt)
+    name = string.format("%s_%s-%s.%s", name, timestamp(shift), timestamp(endpos), fmt)
+    return name:gsub(":", "-")
 end
 
 local function cut(shift, endpos)
@@ -106,7 +105,7 @@ local function cut(shift, endpos)
         :arg("-t", (command_template.t:gsub("$duration", endpos - shift)))
         :arg("-c:v", o.vcodec)
         :arg("-c:a", o.acodec)
-        :arg((copy_audio and {nil} or {"-an"})[1])
+        :arg(not copy_audio and "-an" or nil)
         :arg(outpath)
     msg.info("Run commands: " .. cmds:as_str())
     local res, err = cmds:run()
@@ -156,8 +155,10 @@ options.read_options(o)
 o.target_dir = o.target_dir:gsub('"', "")
 file, _ = utils.file_info(mp.command_native({ "expand-path", o.target_dir }))
 if not file then
+    osd("target_dir may not exist")
     msg.warn(string.format("target_dir `%s` may not exist", o.target_dir))
 elseif not file.is_dir then
+    osd("target_dir is a file")
     msg.warn(string.format("target_dir `%s` is a file", o.target_dir))
 end
 o.target_dir = mp.command_native({ "expand-path", o.target_dir })

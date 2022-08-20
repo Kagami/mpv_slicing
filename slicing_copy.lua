@@ -104,19 +104,19 @@ local function cut(shift, endpos)
         :arg("-v", "warning")
         :arg(o.overwrite and "-y" or "-n")
         :arg("-stats")
-    if ua and ua ~= '' and ua ~= 'libmpv' then
-        cmds:arg('-user_agent', ua)
-    end
     if referer and referer ~= '' then
         cmds:arg('-referer', referer)
     end
     cmds:arg("-ss", tostring(shift))
-        :arg("-i", inpath)
-        :arg("-t", tostring(endpos - shift))
-        :arg("-c:v", o.vcodec)
-        :arg("-c:a", o.acodec)
-        :arg(not copy_audio and "-an" or nil)
-        :arg(outpath)
+    cmds:arg("-i", inpath)
+    if ua and ua ~= '' and ua ~= 'libmpv' then
+        cmds:arg('-user_agent', "\""..ua.."\"")
+    end
+    cmds:arg("-t", tostring(endpos - shift))
+    cmds:arg("-c:v", o.vcodec)
+    cmds:arg("-c:a", o.acodec)
+    cmds:arg(not copy_audio and "-an" or nil)
+    cmds:arg(outpath)
     msg.info("Run commands: " .. cmds:as_str())
     local res, err = cmds:run()
     if err then

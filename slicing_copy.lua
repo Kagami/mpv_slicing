@@ -85,6 +85,10 @@ local function info(s)
     osd(s)
 end
 
+local function is_remote()
+    if string.match(mp.get_property("path"),"://") ~= nil then return true else return false end
+end
+
 local function get_outname(shift, endpos)
     local name = mp.get_property("filename/no-ext")
     local ext = get_ext()
@@ -104,14 +108,14 @@ local function cut(shift, endpos)
         :arg("-v", "warning")
         :arg(o.overwrite and "-y" or "-n")
         :arg("-stats")
+    if is_remote() and ua and ua ~= '' and ua ~= 'libmpv' then
+        cmds:arg('-user_agent', "\""..ua.."\"")
+    end
     if referer and referer ~= '' then
         cmds:arg('-referer', referer)
     end
     cmds:arg("-ss", tostring(shift))
     cmds:arg("-i", inpath)
-    if ua and ua ~= '' and ua ~= 'libmpv' then
-        cmds:arg('-user_agent', "\""..ua.."\"")
-    end
     cmds:arg("-t", tostring(endpos - shift))
     cmds:arg("-c:v", o.vcodec)
     cmds:arg("-c:a", o.acodec)

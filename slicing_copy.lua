@@ -86,7 +86,7 @@ local function info(s)
 end
 
 local function is_remote()
-    if string.match(mp.get_property("path"),"://") ~= nil then return true else return false end
+    return string.match(mp.get_property("path"),"://") ~= nil
 end
 
 local function get_outname(shift, endpos)

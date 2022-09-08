@@ -109,7 +109,7 @@ local function cut(shift, endpos)
         :arg(o.overwrite and "-y" or "-n")
         :arg("-stats")
     if is_remote() and ua and ua ~= '' and ua ~= 'libmpv' then
-        cmds:arg('-user_agent', "\""..ua.."\"")
+        cmds:arg('-user_agent', ua)
     end
     if referer and referer ~= '' then
         cmds:arg('-referer', referer)

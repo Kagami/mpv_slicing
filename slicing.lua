@@ -79,8 +79,8 @@ function get_outname(shift, endpos)
     local dotidx = name:reverse():find(".", 1, true)
     if dotidx then name = name:sub(1, -dotidx-1) end
     name = name:gsub(" ", "_")
-    name = name:gsub(":", "-")
     name = name .. string.format(".%s-%s", timestamp(shift), timestamp(endpos))
+    name = name:gsub(":", "-")
     return name
 end
 
